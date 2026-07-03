@@ -7,7 +7,6 @@
 
 <title>SERVICARNES</title>
 
-<!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#b00000">
 
@@ -17,21 +16,26 @@
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
 
 <header class="hero">
-<div class="overlay">
-<h1 class="logo">SERVICARNES</h1>
-<p class="subtitulo">PRODUCTOS DE ALMACÉN</p>
-</div>
+    <div class="overlay">
+        <h1 class="logo">SERVICARNES</h1>
+        <p class="subtitulo">PRODUCTOS DE ALMACÉN</p>
+    </div>
 </header>
 
 <section class="panel">
 
 <div class="busqueda">
-<input type="text" id="buscar" placeholder="Buscar por código o nombre...">
+
+<input
+type="text"
+id="buscar"
+placeholder="Buscar por código o nombre...">
 
 <select id="almacen">
 <option value="Todos">Todos los almacenes</option>
@@ -40,12 +44,26 @@
 <option>Almacén 3</option>
 <option>Almacén 4</option>
 </select>
+
 </div>
 
 <div class="estadisticas">
-<div class="card"><h2 id="total">0</h2><span>Productos</span></div>
-<div class="card verde"><h2 id="existencia">0</h2><span>En existencia</span></div>
-<div class="card rojo"><h2 id="agotado">0</h2><span>Agotados</span></div>
+
+<div class="card">
+<h2 id="total">0</h2>
+<span>Productos</span>
+</div>
+
+<div class="card verde">
+<h2 id="existencia">0</h2>
+<span>En existencia</span>
+</div>
+
+<div class="card rojo">
+<h2 id="agotado">0</h2>
+<span>Agotados</span>
+</div>
+
 </div>
 
 <div id="productos"></div>
@@ -54,19 +72,89 @@
 
 </section>
 
-<!-- FIREBASE (OBLIGATORIO) -->
+<!-- ========= MODAL AGREGAR PRODUCTO ========= -->
+
+<div id="modalProducto" class="modalProducto">
+
+<div class="contenidoModal">
+
+<h2>Nuevo Producto</h2>
+
+<input
+type="text"
+id="nombre"
+placeholder="Nombre del producto">
+
+<input
+type="text"
+id="codigo"
+placeholder="Código">
+
+<select id="almacenNuevo">
+
+<option>Almacén 1</option>
+<option>Almacén 2</option>
+<option>Almacén 3</option>
+<option>Almacén 4</option>
+
+</select>
+
+<select id="estadoNuevo">
+
+<option value="true">
+En existencia
+</option>
+
+<option value="false">
+Agotado
+</option>
+
+</select>
+
+<input
+type="file"
+id="imagen"
+accept="image/*">
+
+<img
+id="preview"
+style="display:none;width:100%;border-radius:12px;margin-top:10px;">
+
+<div id="progreso">
+</div>
+
+<div class="botonesModal">
+
+<button id="cancelar">
+Cancelar
+</button>
+
+<button id="guardarProducto">
+Guardar
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- FIREBASE -->
+
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
-<!-- TU APP -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+
 <script src="app.js"></script>
 
-<!-- SERVICE WORKER -->
 <script>
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
+navigator.serviceWorker.register('sw.js');
 }
 </script>
 
 </body>
+
 </html>
