@@ -1,10 +1,20 @@
-let productos = JSON.parse(localStorage.getItem("productos")) || [];
+const firebaseConfig = {
+  apiKey: "AIzaSyDw0LFKBiY6m1E7S4U-Dru0GOdI1icqPoM",
+  authDomain: "servicarnes.firebaseapp.com",
+  projectId: "servicarnes",
+  storageBucket: "servicarnes.firebasestorage.app",
+  messagingSenderId: "472598803018",
+  appId: "1:472598803018:web:6cca7571b8b7624d0cacb3"
+};
 
-function guardar() {
-    localStorage.setItem("productos", JSON.stringify(productos));
-}
+// INIT FIREBASE
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const productosRef = db.collection("productos");
 
-/* MODAL */
+/* =========================
+   MODAL
+========================= */
 function crearModal() {
     if (document.getElementById("modal")) return;
 
@@ -29,7 +39,6 @@ function crearModal() {
 
     modal.addEventListener("click", () => {
         modal.style.display = "none";
-        document.getElementById("modalImg").src = "";
     });
 
     document.body.appendChild(modal);
@@ -37,112 +46,101 @@ function crearModal() {
 
 function verImagen(url) {
     const modal = document.getElementById("modal");
-    const modalImg = document.getElementById("modalImg");
-
-    modalImg.src = url;
+    const img = document.getElementById("modalImg");
+    img.src = url;
     modal.style.display = "flex";
 }
 
-/* RENDER */
-function render(lista = productos) {
-    const contenedor = document.getElementById("productos");
-    contenedor.innerHTML = "";
+/* =========================
+   RENDER (FIREBASE REALTIME)
+========================= */
+function render() {
+    productosRef.onSnapshot(snapshot => {
+        const productos = [];
 
-    lista.forEach((p, index) => {
-        contenedor.innerHTML += `
-        <div class="producto">
+        snapshot.forEach(doc => {
+            productos.push({ id: doc.id, ...doc.data() });
+        });
 
-            <img src="${p.imagen || 'https://via.placeholder.com/600x300'}"
-                 style="cursor:pointer"
-                 onclick="verImagen('${p.imagen || ''}')">
+        const contenedor = document.getElementById("productos");
+        contenedor.innerHTML = "";
 
-            <div class="info">
-                <h2>${p.nombre}</h2>
-                <div class="codigo">${p.codigo}</div>
-                <div>${p.almacen}</div>
+        productos.forEach(p => {
+            contenedor.innerHTML += `
+            <div class="producto">
 
-                <div class="estado ${p.existencia ? 'existencia' : 'agotado'}">
-                    ${p.existencia ? "En existencia" : "Agotado"}
+                <img src="${p.imagen || 'https://via.placeholder.com/600x300'}"
+                     style="cursor:pointer"
+                     onclick="verImagen('${p.imagen || ''}')">
+
+                <div class="info">
+                    <h2>${p.nombre}</h2>
+                    <div class="codigo">${p.codigo}</div>
+                    <div>${p.almacen}</div>
+
+                    <div class="estado ${p.existencia ? 'existencia' : 'agotado'}">
+                        ${p.existencia ? "En existencia" : "Agotado"}
+                    </div>
+
+                    <button onclick="editar('${p.id}', '${p.nombre}', '${p.codigo}', '${p.imagen}', '${p.almacen}', ${p.existencia})">✏️</button>
+                    <button onclick="eliminar('${p.id}')">🗑</button>
                 </div>
 
-                <button onclick="editar(${index})">✏️</button>
-                <button onclick="eliminar(${index})">🗑</button>
             </div>
+            `;
+        });
 
-        </div>
-        `;
+        document.getElementById("total").textContent = productos.length;
+        document.getElementById("existencia").textContent = productos.filter(p => p.existencia).length;
+        document.getElementById("agotado").textContent = productos.filter(p => !p.existencia).length;
     });
-
-    actualizarEstadisticas(lista);
 }
 
-function actualizarEstadisticas(lista) {
-    document.getElementById("total").textContent = lista.length;
-    document.getElementById("existencia").textContent = lista.filter(p => p.existencia).length;
-    document.getElementById("agotado").textContent = lista.filter(p => !p.existencia).length;
-}
-
-/* AGREGAR */
+/* =========================
+   AGREGAR
+========================= */
 window.addEventListener("DOMContentLoaded", () => {
 
     crearModal();
 
-    document.getElementById("agregar").addEventListener("click", () => {
+    document.getElementById("agregar").addEventListener("click", async () => {
 
         const nombre = prompt("Nombre:");
         if (!nombre) return;
 
-        productos.push({
+        await productosRef.add({
             nombre,
             codigo: prompt("Código:"),
             imagen: prompt("Imagen URL:"),
             almacen: prompt("Almacén:"),
             existencia: confirm("OK = existe / Cancel = agotado")
         });
-
-        guardar();
-        render();
     });
+
+    render();
 });
 
-/* EDITAR */
-function editar(index) {
-    const p = productos[index];
+/* =========================
+   EDITAR
+========================= */
+async function editar(id, nombre, codigo, imagen, almacen, existencia) {
 
-    productos[index] = {
-        ...p,
-        nombre: prompt("Nombre:", p.nombre),
-        codigo: prompt("Código:", p.codigo),
-        imagen: prompt("Imagen:", p.imagen),
-        almacen: prompt("Almacén:", p.almacen),
+    const nuevoNombre = prompt("Nombre:", nombre);
+    if (!nuevoNombre) return;
+
+    await productosRef.doc(id).update({
+        nombre: nuevoNombre,
+        codigo: prompt("Código:", codigo),
+        imagen: prompt("Imagen:", imagen),
+        almacen: prompt("Almacén:", almacen),
         existencia: confirm("OK = existe / Cancel = agotado")
-    };
-
-    guardar();
-    render();
+    });
 }
 
-/* ELIMINAR */
-function eliminar(index) {
+/* =========================
+   ELIMINAR
+========================= */
+async function eliminar(id) {
     if (!confirm("¿Eliminar producto?")) return;
-
-    productos.splice(index, 1);
-    guardar();
-    render();
+    await productosRef.doc(id).delete();
 }
-
-/* FILTROS */
-document.getElementById("buscar").addEventListener("input", e => {
-    const v = e.target.value.toLowerCase();
-    render(productos.filter(p =>
-        p.nombre.toLowerCase().includes(v) ||
-        p.codigo.toLowerCase().includes(v)
-    ));
-});
-
-document.getElementById("almacen").addEventListener("change", e => {
-    if (e.target.value === "Todos") return render();
-    render(productos.filter(p => p.almacen === e.target.value));
-});
-
-render();
