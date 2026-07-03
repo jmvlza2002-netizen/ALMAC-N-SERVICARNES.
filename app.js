@@ -4,10 +4,10 @@ const firebaseConfig = {
   projectId: "servicarnes",
   storageBucket: "servicarnes.firebasestorage.app",
   messagingSenderId: "472598803018",
-  appId: "1:472598803018:web:6cca7571b8b7624d0cacb3"
+  appId: "1:472598803018:web:51a80414720ff6e30cacb3"
 };
 
-// INIT FIREBASE
+// INIT FIREBASE (compat)
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const productosRef = db.collection("productos");
@@ -52,12 +52,12 @@ function verImagen(url) {
 }
 
 /* =========================
-   RENDER (FIREBASE REALTIME)
+   RENDER EN TIEMPO REAL
 ========================= */
 function render() {
     productosRef.onSnapshot(snapshot => {
-        const productos = [];
 
+        const productos = [];
         snapshot.forEach(doc => {
             productos.push({ id: doc.id, ...doc.data() });
         });
@@ -91,8 +91,10 @@ function render() {
         });
 
         document.getElementById("total").textContent = productos.length;
-        document.getElementById("existencia").textContent = productos.filter(p => p.existencia).length;
-        document.getElementById("agotado").textContent = productos.filter(p => !p.existencia).length;
+        document.getElementById("existencia").textContent =
+            productos.filter(p => p.existencia).length;
+        document.getElementById("agotado").textContent =
+            productos.filter(p => !p.existencia).length;
     });
 }
 
