@@ -1,14 +1,14 @@
 let productos = JSON.parse(localStorage.getItem("productos")) || [];
 
 /* =========================
-   GUARDAR EN MEMORIA
+   GUARDAR EN LOCALSTORAGE
 ========================= */
 function guardar() {
     localStorage.setItem("productos", JSON.stringify(productos));
 }
 
 /* =========================
-   RENDER PRINCIPAL
+   RENDER DE PRODUCTOS
 ========================= */
 function render(lista = productos) {
     const contenedor = document.getElementById("productos");
@@ -47,28 +47,36 @@ function actualizarEstadisticas(lista) {
 }
 
 /* =========================
-   AGREGAR PRODUCTO (SIN PROMPT)
+   AGREGAR PRODUCTO (SEGURO)
 ========================= */
-document.getElementById("agregar").addEventListener("click", () => {
+window.addEventListener("DOMContentLoaded", () => {
 
-    const nombre = prompt("Nombre del producto:");
-    if (!nombre) return;
+    const btn = document.getElementById("agregar");
 
-    const codigo = prompt("Código:");
-    const imagen = prompt("URL de imagen (opcional):");
-    const almacen = prompt("Almacén (Almacén 1-4):");
-    const existencia = confirm("OK = En existencia / Cancel = Agotado");
+    if (btn) {
+        btn.addEventListener("click", () => {
 
-    productos.push({
-        nombre,
-        codigo,
-        imagen,
-        almacen,
-        existencia
-    });
+            const nombre = prompt("Nombre del producto:");
+            if (!nombre) return;
 
-    guardar();
-    render();
+            const codigo = prompt("Código del producto:");
+            const imagen = prompt("URL de imagen (opcional):");
+            const almacen = prompt("Almacén (Almacén 1-4):");
+            const existencia = confirm("OK = En existencia / Cancel = Agotado");
+
+            productos.push({
+                nombre,
+                codigo,
+                imagen,
+                almacen,
+                existencia
+            });
+
+            guardar();
+            render();
+        });
+    }
+
 });
 
 /* =========================
@@ -95,7 +103,7 @@ document.getElementById("buscar").addEventListener("input", (e) => {
 });
 
 /* =========================
-   FILTRO ALMACÉN
+   FILTRO POR ALMACÉN
 ========================= */
 document.getElementById("almacen").addEventListener("change", (e) => {
     const valor = e.target.value;
