@@ -8,6 +8,55 @@ function guardar() {
 }
 
 /* =========================
+   MODAL IMAGEN
+========================= */
+function crearModal() {
+    if (document.getElementById("modal")) return;
+
+    const modal = document.createElement("div");
+    modal.id = "modal";
+    modal.style.cssText = `
+        display:none;
+        position:fixed;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        background:rgba(0,0,0,0.85);
+        justify-content:center;
+        align-items:center;
+        z-index:999;
+    `;
+
+    modal.innerHTML = `
+        <img id="modalImg" style="
+            max-width:90%;
+            max-height:80%;
+            border-radius:15px;
+            box-shadow:0 0 20px black;
+        ">
+    `;
+
+    modal.addEventListener("click", () => {
+        modal.style.display = "none";
+        document.getElementById("modalImg").src = "";
+    });
+
+    document.body.appendChild(modal);
+}
+
+/* =========================
+   ABRIR IMAGEN
+========================= */
+function verImagen(url) {
+    const modal = document.getElementById("modal");
+    const modalImg = document.getElementById("modalImg");
+
+    modalImg.src = url;
+    modal.style.display = "flex";
+}
+
+/* =========================
    RENDER DE PRODUCTOS
 ========================= */
 function render(lista = productos) {
@@ -17,7 +66,10 @@ function render(lista = productos) {
     lista.forEach((p, index) => {
         contenedor.innerHTML += `
         <div class="producto">
-            <img src="${p.imagen || 'https://via.placeholder.com/600x300'}">
+
+            <img src="${p.imagen || 'https://via.placeholder.com/600x300'}"
+                 style="cursor:pointer"
+                 onclick="verImagen('${p.imagen || 'https://via.placeholder.com/600x300'}')">
 
             <div class="info">
                 <h2>${p.nombre}</h2>
@@ -30,6 +82,7 @@ function render(lista = productos) {
 
                 <button onclick="eliminar(${index})">🗑 Eliminar</button>
             </div>
+
         </div>
         `;
     });
@@ -47,9 +100,11 @@ function actualizarEstadisticas(lista) {
 }
 
 /* =========================
-   AGREGAR PRODUCTO (SEGURO)
+   AGREGAR PRODUCTO
 ========================= */
 window.addEventListener("DOMContentLoaded", () => {
+
+    crearModal();
 
     const btn = document.getElementById("agregar");
 
@@ -80,9 +135,13 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 /* =========================
-   ELIMINAR PRODUCTO
+   ELIMINAR PRODUCTO (CON CONFIRMACIÓN)
 ========================= */
 function eliminar(index) {
+    const confirmar = confirm("¿Seguro que quieres eliminar este producto?");
+
+    if (!confirmar) return;
+
     productos.splice(index, 1);
     guardar();
     render();
