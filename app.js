@@ -1,15 +1,10 @@
 let productos = JSON.parse(localStorage.getItem("productos")) || [];
 
-/* =========================
-   GUARDAR EN LOCALSTORAGE
-========================= */
 function guardar() {
     localStorage.setItem("productos", JSON.stringify(productos));
 }
 
-/* =========================
-   MODAL IMAGEN
-========================= */
+/* MODAL */
 function crearModal() {
     if (document.getElementById("modal")) return;
 
@@ -29,12 +24,7 @@ function crearModal() {
     `;
 
     modal.innerHTML = `
-        <img id="modalImg" style="
-            max-width:90%;
-            max-height:80%;
-            border-radius:15px;
-            box-shadow:0 0 20px black;
-        ">
+        <img id="modalImg" style="max-width:90%;max-height:80%;border-radius:15px;">
     `;
 
     modal.addEventListener("click", () => {
@@ -45,9 +35,6 @@ function crearModal() {
     document.body.appendChild(modal);
 }
 
-/* =========================
-   VER IMAGEN
-========================= */
 function verImagen(url) {
     const modal = document.getElementById("modal");
     const modalImg = document.getElementById("modalImg");
@@ -56,9 +43,7 @@ function verImagen(url) {
     modal.style.display = "flex";
 }
 
-/* =========================
-   RENDER
-========================= */
+/* RENDER */
 function render(lista = productos) {
     const contenedor = document.getElementById("productos");
     contenedor.innerHTML = "";
@@ -69,19 +54,19 @@ function render(lista = productos) {
 
             <img src="${p.imagen || 'https://via.placeholder.com/600x300'}"
                  style="cursor:pointer"
-                 onclick="verImagen('${p.imagen || 'https://via.placeholder.com/600x300'}')">
+                 onclick="verImagen('${p.imagen || ''}')">
 
             <div class="info">
                 <h2>${p.nombre}</h2>
-                <div class="codigo">Código: ${p.codigo}</div>
-                <div>Almacén: ${p.almacen}</div>
+                <div class="codigo">${p.codigo}</div>
+                <div>${p.almacen}</div>
 
                 <div class="estado ${p.existencia ? 'existencia' : 'agotado'}">
                     ${p.existencia ? "En existencia" : "Agotado"}
                 </div>
 
-                <button onclick="editar(${index})">✏️ Editar</button>
-                <button onclick="eliminar(${index})">🗑 Eliminar</button>
+                <button onclick="editar(${index})">✏️</button>
+                <button onclick="eliminar(${index})">🗑</button>
             </div>
 
         </div>
@@ -91,119 +76,73 @@ function render(lista = productos) {
     actualizarEstadisticas(lista);
 }
 
-/* =========================
-   ESTADÍSTICAS
-========================= */
 function actualizarEstadisticas(lista) {
     document.getElementById("total").textContent = lista.length;
     document.getElementById("existencia").textContent = lista.filter(p => p.existencia).length;
     document.getElementById("agotado").textContent = lista.filter(p => !p.existencia).length;
 }
 
-/* =========================
-   AGREGAR
-========================= */
+/* AGREGAR */
 window.addEventListener("DOMContentLoaded", () => {
 
     crearModal();
 
-    const btn = document.getElementById("agregar");
+    document.getElementById("agregar").addEventListener("click", () => {
 
-    if (btn) {
-        btn.addEventListener("click", () => {
+        const nombre = prompt("Nombre:");
+        if (!nombre) return;
 
-            const nombre = prompt("Nombre del producto:");
-            if (!nombre) return;
-
-            const codigo = prompt("Código del producto:");
-            const imagen = prompt("URL de imagen (opcional):");
-            const almacen = prompt("Almacén (Almacén 1-4):");
-            const existencia = confirm("OK = En existencia / Cancel = Agotado");
-
-            productos.push({
-                nombre,
-                codigo,
-                imagen,
-                almacen,
-                existencia
-            });
-
-            guardar();
-            render();
+        productos.push({
+            nombre,
+            codigo: prompt("Código:"),
+            imagen: prompt("Imagen URL:"),
+            almacen: prompt("Almacén:"),
+            existencia: confirm("OK = existe / Cancel = agotado")
         });
-    }
 
+        guardar();
+        render();
+    });
 });
 
-/* =========================
-   EDITAR PRODUCTO
-========================= */
+/* EDITAR */
 function editar(index) {
     const p = productos[index];
 
-    const nombre = prompt("Editar nombre:", p.nombre);
-    if (!nombre) return;
-
-    const codigo = prompt("Editar código:", p.codigo);
-    const imagen = prompt("Editar imagen URL:", p.imagen);
-    const almacen = prompt("Editar almacén:", p.almacen);
-    const existencia = confirm("OK = En existencia / Cancel = Agotado");
-
     productos[index] = {
         ...p,
-        nombre,
-        codigo,
-        imagen,
-        almacen,
-        existencia
+        nombre: prompt("Nombre:", p.nombre),
+        codigo: prompt("Código:", p.codigo),
+        imagen: prompt("Imagen:", p.imagen),
+        almacen: prompt("Almacén:", p.almacen),
+        existencia: confirm("OK = existe / Cancel = agotado")
     };
 
     guardar();
     render();
 }
 
-/* =========================
-   ELIMINAR (CON CONFIRMACIÓN)
-========================= */
+/* ELIMINAR */
 function eliminar(index) {
-    const confirmar = confirm("¿Seguro que quieres eliminar este producto?");
-
-    if (!confirmar) return;
+    if (!confirm("¿Eliminar producto?")) return;
 
     productos.splice(index, 1);
     guardar();
     render();
 }
 
-/* =========================
-   BÚSQUEDA
-========================= */
-document.getElementById("buscar").addEventListener("input", (e) => {
-    const valor = e.target.value.toLowerCase();
-
-    const filtrados = productos.filter(p =>
-        p.nombre.toLowerCase().includes(valor) ||
-        p.codigo.toLowerCase().includes(valor)
-    );
-
-    render(filtrados);
+/* FILTROS */
+document.getElementById("buscar").addEventListener("input", e => {
+    const v = e.target.value.toLowerCase();
+    render(productos.filter(p =>
+        p.nombre.toLowerCase().includes(v) ||
+        p.codigo.toLowerCase().includes(v)
+    ));
 });
 
-/* =========================
-   FILTRO ALMACÉN
-========================= */
-document.getElementById("almacen").addEventListener("change", (e) => {
-    const valor = e.target.value;
-
-    if (valor === "Todos") {
-        render();
-    } else {
-        const filtrados = productos.filter(p => p.almacen === valor);
-        render(filtrados);
-    }
+document.getElementById("almacen").addEventListener("change", e => {
+    if (e.target.value === "Todos") return render();
+    render(productos.filter(p => p.almacen === e.target.value));
 });
 
-/* =========================
-   INICIO
-========================= */
 render();
