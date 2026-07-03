@@ -46,7 +46,7 @@ function crearModal() {
 }
 
 /* =========================
-   ABRIR IMAGEN
+   VER IMAGEN
 ========================= */
 function verImagen(url) {
     const modal = document.getElementById("modal");
@@ -57,7 +57,7 @@ function verImagen(url) {
 }
 
 /* =========================
-   RENDER DE PRODUCTOS
+   RENDER
 ========================= */
 function render(lista = productos) {
     const contenedor = document.getElementById("productos");
@@ -80,6 +80,7 @@ function render(lista = productos) {
                     ${p.existencia ? "En existencia" : "Agotado"}
                 </div>
 
+                <button onclick="editar(${index})">✏️ Editar</button>
                 <button onclick="eliminar(${index})">🗑 Eliminar</button>
             </div>
 
@@ -100,7 +101,7 @@ function actualizarEstadisticas(lista) {
 }
 
 /* =========================
-   AGREGAR PRODUCTO
+   AGREGAR
 ========================= */
 window.addEventListener("DOMContentLoaded", () => {
 
@@ -135,7 +136,34 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 /* =========================
-   ELIMINAR PRODUCTO (CON CONFIRMACIÓN)
+   EDITAR PRODUCTO
+========================= */
+function editar(index) {
+    const p = productos[index];
+
+    const nombre = prompt("Editar nombre:", p.nombre);
+    if (!nombre) return;
+
+    const codigo = prompt("Editar código:", p.codigo);
+    const imagen = prompt("Editar imagen URL:", p.imagen);
+    const almacen = prompt("Editar almacén:", p.almacen);
+    const existencia = confirm("OK = En existencia / Cancel = Agotado");
+
+    productos[index] = {
+        ...p,
+        nombre,
+        codigo,
+        imagen,
+        almacen,
+        existencia
+    };
+
+    guardar();
+    render();
+}
+
+/* =========================
+   ELIMINAR (CON CONFIRMACIÓN)
 ========================= */
 function eliminar(index) {
     const confirmar = confirm("¿Seguro que quieres eliminar este producto?");
@@ -162,7 +190,7 @@ document.getElementById("buscar").addEventListener("input", (e) => {
 });
 
 /* =========================
-   FILTRO POR ALMACÉN
+   FILTRO ALMACÉN
 ========================= */
 document.getElementById("almacen").addEventListener("change", (e) => {
     const valor = e.target.value;
