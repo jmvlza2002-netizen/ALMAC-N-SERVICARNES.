@@ -14,7 +14,7 @@ body{
     height:300px;
     background:
     linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.75)),
-    url('https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?auto=format&fit=crop&w=1200&q=80');
+    (urlhttps://cdn.phototourl.com/free/2026-07-03-4687c90e-5495-4d53-a7cb-bf0b21ef2a79.jpg);
     background-size:cover;
     background-position:center;
     display:flex;
