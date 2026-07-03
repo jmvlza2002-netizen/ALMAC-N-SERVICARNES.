@@ -11,6 +11,9 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#b00000">
 
+<!-- ICONO (IMPORTANTE PARA INSTALAR) -->
+<link rel="icon" href="icono.png">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
@@ -30,6 +33,7 @@
 
 <section class="panel">
 
+<!-- BUSQUEDA -->
 <div class="busqueda">
 <input type="text" id="buscar" placeholder="Buscar por código o nombre...">
 
@@ -42,18 +46,28 @@
 </select>
 </div>
 
+<!-- ESTADISTICAS -->
 <div class="estadisticas">
 <div class="card"><h2 id="total">0</h2><span>Productos</span></div>
 <div class="card verde"><h2 id="existencia">0</h2><span>En existencia</span></div>
 <div class="card rojo"><h2 id="agotado">0</h2><span>Agotados</span></div>
 </div>
 
+<!-- PRODUCTOS -->
 <div id="productos"></div>
 
+<!-- BOTÓN AGREGAR -->
 <button id="agregar">＋</button>
 
 </section>
 
+<!-- =========================
+FIREBASE (IMPORTANTE)
+========================= -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<!-- TU APP -->
 <script src="app.js"></script>
 
 <!-- SERVICE WORKER -->
